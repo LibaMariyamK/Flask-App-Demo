@@ -67,7 +67,7 @@
     <div class="container">
         <h2>Penguin Species Predictor</h2>
 
-        <form method="POST">
+        <form action="{{ url_for('predict') }}" method="POST">
 
             <label>Bill Length (mm):</label>
             <input type="text" name="bill_length" required>
@@ -97,9 +97,9 @@
             <button type="submit">Predict</button>
         </form>
 
-        {% if prediction %}
-            <h3>Predicted Species: {{ prediction }}</h3>
-        {% endif %}
+        
+        <h3>{{ prediction }}</h3>
+        
     </div>
 
 </body>
