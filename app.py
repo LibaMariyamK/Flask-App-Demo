@@ -10,34 +10,36 @@ le_sex = pickle.load(open("sex_encoder.pkl", "rb"))
 le_island = pickle.load(open("island_encoder.pkl", "rb"))
 scaler = pickle.load(open("scaler.pkl",'rb'))
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-    prediction = None
+@app.route('/')
+def home():
+    return render_template('index.html', prediction='')
 
-    if request.method == "POST":
-        bill_length = float(request.form["bill_length"])
-        bill_depth = float(request.form["bill_depth"])
-        flipper_len = float(request.form["flipper_len"])
-        body_mass = float(request.form["body_mass"])
-        sex_input = request.form["sex"]
-        island_input = request.form["island"]
 
-        # Create dataframe for prediction
-        input_data = pd.DataFrame([[
-        island_input,bill_length, bill_depth, flipper_len, body_mass,sex_input]],
-        columns=['island', 'bill_length_mm', 'bill_depth_mm', 'flipper_length_mm',
-       'body_mass_g', 'sex'])
+@app.route('/predict', methods=['POST'])
+def predict():
+    bill_length = float(request.form["bill_length"])
+    bill_depth = float(request.form["bill_depth"])
+    flipper_len = float(request.form["flipper_len"])
+    body_mass = float(request.form["body_mass"])
+    sex_input = request.form["sex"]
+    island_input = request.form["island"]
 
-        # Encode user inputs
-        input_data["sex"] = le_sex.transform(input_data["sex"])
-        input_data["island"] = le_island.transform(input_data["island"])
+    # Create dataframe for prediction
+    input_data = pd.DataFrame([[
+    island_input,bill_length, bill_depth, flipper_len, body_mass,sex_input]],
+    columns=['island', 'bill_length_mm', 'bill_depth_mm', 'flipper_length_mm',
+    'body_mass_g', 'sex'])
 
-        #scaling
-        input_data=scaler.transform(input_data)
-        
-        # Predict
-        result = model.predict(input_data)
-        prediction = result[0]
+    # Encode user inputs
+    input_data["sex"] = le_sex.transform(input_data["sex"])
+    input_data["island"] = le_island.transform(input_data["island"])
+
+    #scaling
+    input_data=scaler.transform(input_data)
+
+    # Predict
+    result = model.predict(input_data)
+    prediction = f"Predicted Species: {result[0]}"
 
     return render_template("index.html", prediction=prediction)
 
